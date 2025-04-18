@@ -1,0 +1,115 @@
+package com.hitachi.droneroute.dpm.dto;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+/**
+ * ドローンポート情報詳細取得応答
+ * @author Hiroshi Toyoda
+ *
+ */
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+public class DronePortInfoDetailResponseDto {
+
+	/**
+	 * ドローンポートID
+	 */
+	private String dronePortId;
+	
+	/**
+	 * ドローンポート名
+	 */
+	private String dronePortName;
+	
+	/**
+	 * 設置場所住所
+	 */
+	private String address;
+	
+	/**
+	 * 製造メーカー
+	 */
+	private String manufacturer;
+	
+	/**
+	 * 製造番号
+	 */
+	private String serialNumber;
+	
+	/**
+	 * ポート形状
+	 */
+	private Integer portType;
+	
+	/**
+	 * VISドローンポート事業者ID
+	 */
+	private String visDronePortCompanyId;
+
+	/**
+	 * 格納中機体ID
+	 */
+	private String storedAircraftId;
+	
+	/**
+	 * 緯度
+	 */
+	private Double lat;
+	
+	/**
+	 * 経度
+	 */
+	private Double lon;
+	
+	/**
+	 * 着陸面対地高度
+	 */
+	private Double alt;
+	
+	/**
+	 * 対応機体
+	 */
+	private String supportDroneType;
+	
+	/**
+	 * 動作状況
+	 */
+	private Integer activeStatus;
+	
+	/**
+	 * 予定された動作状態
+	 */
+	private Integer scheduledStatus;
+	
+	/**
+	 * 使用不可開始日時
+	 */
+	private String inactiveTimeFrom;
+	
+	/**
+	 * 使用不可終了日時
+	 */
+	private String inactiveTimeTo;
+	
+	/**
+	 * オペレータID
+	 */
+	private String operatorId;
+	
+	/**
+	 * 更新日時
+	 */
+	private String updateTime;
+	
+	/**
+	 * 画像
+	 */
+	@ToString.Exclude
+	private String imageData;
+
+}

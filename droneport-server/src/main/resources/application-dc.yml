@@ -1,0 +1,112 @@
+server:
+  # RESTコントローラのポート
+  port: 8080
+  tomcat:
+    relaxed-path-chars: <,>,[,]
+    relaxed-query-chars: <,>,[,],|,{,}
+    remoteip:
+      protocol-header: x-forwarded-proto
+
+spring:
+  main:
+    # tomcatを起動
+    web-application-type: SERVLET
+  application:
+    name: droneport-server
+  # JDBC Datasource設定
+  datasource:
+    driverClassName: org.postgresql.Driver
+    username: droneroute
+    password: droneroute
+    url: jdbc:postgresql://localhost:5432/droneroute?rewriteBatchedStatements=true
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # ログにSQLを出力する
+#    properties:
+#      hibernate:
+#        show_sql: true
+#        use_sql_comments: true
+#        format_sql: true
+
+logging:
+  level:
+    com.hitachi.droneroute: debug
+    # ログにSQLを出力する
+#    org.hibernate.SQL: debug
+#    org.hibernate.type: trace
+#    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    
+droneroute:
+  basepath: /asset/api
+
+codemaster:
+  codeclass:
+    droneport-info-port-type:
+      0: "緊急着陸地点"
+      1: "ドローンポート"
+      2: "離発着場"
+    droneport-info-usage-type:
+      1: "駐機場"
+      2: "緊急着陸地点"
+    droneport-info-drone-port-type:
+      1: "自システム管理"
+      2: "VIS管理"
+      3: "他事業者管理"
+    droneport-reserve-usage-type:
+      1: "離陸ポート"
+      2: "着陸ポート"
+      3: "その他"
+    aircraft-info-aircraft_type:
+      1: "飛行機"
+      2: "回転翼航空機（ヘリコプター）"
+      3: "回転翼航空機（マルチローター）"
+      4: "回転翼航空機（その他）"
+      5: "滑空機"
+      6: "飛行船"
+    aircraft-info-owner-type:
+      1: "事業者所有機体"
+      2: "レンタル機体"
+    droneport-info-active-status:
+      1: "準備中"
+      2: "使用可"
+      3: "使用不可"
+      4: "メンテナンス中"
+
+systemsettings:
+  settingclass:
+    imageData:
+      supportFormat: "png,jpeg,heic,heif"
+      maxBinarySize: "2097152"
+    visConnectInfo:
+      brokerUrl: "tcp://localhost:1883"
+      userName: "droneroutehitachi"
+      password: "droneroutehitachi"
+      qos: "0"
+      clientId: "droneroute"
+      mqttBaseUri: "paho:%s?brokerUrl=%s&userName=%s&password=%s&qos=%s&clientId=%s"
+      topicSubscribeTelemetryInfo: "airway/droneport/information/#"
+      topicSubscribeQueryReservationRequest: "cmd/dadc/hitachi/droneport/booking/list"
+      topicPublishQueryReservationResponse: "res/dadc/vis/droneport/booking/list"
+      enableSubscribeTelemetryInfo: "false"
+      enableSubscribeQueryReservationRequest: "false"
+    dronePortId:
+      dronerouteOperatorId: "ROUTEOPRID"
+      format: "%s-%s-%d"
+    dronePortReservation:
+      reservablePortType: "1,2"
+    getListDefault:
+      perPage: "50"
+    dronePortInfoListDefault:
+      sortOrders: "0,0"
+      sortColumns: "dronePortName,dronePortId"
+    dronePortReserveInfoListDefault:
+      sortOrders: "1,0"
+      sortColumns: "reservationTime,dronePortId"
+    aircraftInfoListDefault:
+      sortOrders: "0,0"
+      sortColumns: "aircraftName,aircraftId"
+    aircraftReserveInfoListDefault:
+      sortOrders: "1,0"
+      sortColumns: "reservationTime,aircraftId"

@@ -1,0 +1,146 @@
+asyncapi: 3.0.0
+info:
+  title: ポート離着陸準備指示 ポート離着陸準備受付・準備完了通知API
+  version: 1.0.0
+  description: |
+    本APIでは以下について規定します。
+    - ポート離着陸準備指示
+    - ポート離着陸準備受付・準備完了通知
+      上記APIはVIS（Vertiport Information System：VertiportにおけるUAS運用に必要な全ての情報を一元管理するシステム）で利用されるAPIで、
+      準機械式または機械式の離着陸場で、離着陸時にUTMSとの通信で使用されます。
+      ※VISはUTMSに向けてのAPIの他、離着陸場管理システムとのAPIも利用します。
+        - テレメトリ情報
+        - ドローンポート予約情報一覧取得
+        - ドローンポート予約情報詳細取得
+        - ドローンポート情報一覧取得
+        - ドローンポート情報詳細取得
+      ※VISはISO5491に準拠して作成されていることを前提としております。
+      ※ISO5491 は、150kg未満の電動貨物用無人航空機システム（UAS）の垂直離着陸場（Vertiport）に関する設備要件を定めた国際標準規格で、2023年6月2日に国際標準化機構（ISO）より正式に発行されました。
+        本規格は、物流分野におけるドローンポートの標準化を目的として策定されたもので、以下の要素を含むドローンポートシステムのインフラおよび機器の要件が定められています。
+         ・ドローンの離着陸や格納機能
+         ・気象や侵入検知などの周辺機器
+         ・上記を統合管理するドローンポート情報管理システム（VIS）
+        この国際規格は、ドローン物流における自動化の運用を見据え、世界で初めて物流用ドローンポートの設備基準として発行されたものです。
+        ISO5491の詳細については、下記ドキュメントを参照してください。
+        https://www.iso.org/standard/81313.html
+        （有料ドキュメントとなりますので、こちらは購入用のリンクとなります。）
+  license:
+    name: unlicensed
+servers:
+  ActiveMQ:
+    host: mqtt.nedo-gsw-utm.com
+    protocol: mqtts
+channels:
+  airway/requestCommand:
+    address: airway/operator/{operatorId}/vis/droneport/{droneportId}/cmd
+    parameters:
+      operatorId:
+        description: オペレーターを一意に識別するID.
+      droneportId:
+        description: ドローンポートを一意に識別するID.
+    messages:
+      requestCommand.message:
+        name: requestCommand
+        payload:
+          type: object
+          properties:
+            utm_id:
+              type: string
+              format: uuid
+              description: UTMを一意に識別するコード.
+            dronePortId:
+              type: string
+              description: ドローンポートを一意に識別するID.
+            dronePortReservationId:
+              type: string
+              description: 予約情報を一意に識別するコード.
+            request_kind:
+              type: number
+              enum:
+                - 0
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              description: |
+                離着陸を区別するための項目.
+                0: 離陸準備指示
+                1: 着陸準備指示
+                2: 離陸通知
+                3: 着陸通知
+                4: 離陸キャンセル通知
+                5: 着陸キャンセル通知
+            seq_number:
+              type: integer
+              description: UTMからVISに依頼を投げる際に使用する番号.
+  airway/commmandStateUpdated:
+    address: airway/operator/{operatorId}/vis/droneport/{droneportId}/cmdRes
+    parameters:
+      operatorId:
+        description: オペレーターを一意に識別するID.
+      droneportId:
+        description: ドローンポートを一意に識別するID.
+    messages:
+      onCommmandStateUpdated.message:
+        name: CommmandStateUpdated
+        payload:
+          type: object
+          properties:
+            dronePortId:
+              type: string
+              description: ドローンポートを一意に識別するID.
+            dronePortReservationId:
+              type: string
+              description: 予約情報を一意に識別するコード.
+            request_kind:
+              type: number
+              enum:
+                - 0
+                - 1
+                - 2
+                - 3
+              description: |
+                応答区分を設定する.
+                0: 離陸指示結果応答（1回目）
+                1: 離陸準備応答（2回目）
+                2: 着陸指示結果応答（1回目）
+                3: 着陸準備応答（2回目）
+            result:
+              type: boolean
+              description: 依頼内容に対する実行結果.
+            info:
+              type: string
+              description: |
+                否認事由等.
+                該当予約なし
+                使用不可
+                機器故障
+                なし
+                ポート動作不成立に伴うポートシーケンスリセット
+                離陸（着陸）判定NG
+                準備指示受付済み
+            seq_number:
+              type: integer
+              description: UTMからVISに依頼を投げる際に使用する番号.
+operations:
+  requestCommand:
+    action: send
+    channel:
+      $ref: '#/channels/airway~1requestCommand'
+    summary: 機体の離陸準備指示をVISに要求する(subscribe)
+  onRequestCommand:
+    action: receive
+    channel:
+      $ref: '#/channels/airway~1requestCommand'
+    summary: 機体の離陸準備指示をVISに要求する(publish)
+  responseCommmandStateUpdated:
+    action: send
+    channel:
+      $ref: '#/channels/airway~1commmandStateUpdated'
+    summary: 離着陸準備指示の応答情報をUTMに送付する(subscribe)
+  onResponseCommmandStateUpdated:
+    action: receive
+    channel:
+      $ref: '#/channels/airway~1commmandStateUpdated'
+    summary: 離着陸準備指示の応答情報をUTMに送付する(publish)
