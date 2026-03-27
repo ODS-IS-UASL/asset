@@ -1,0 +1,2 @@
+// プロジェクトのルート名を設定
+rootProject.name = 'droneport-server'

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+          "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+          "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Spotlessがフォーマットを担当するため、このファイルはロジックや潜在的なバグの検出に特化しています。 -->
+<module name="Checker">
+	<property name="charset" value="UTF-8" />
+	<property name="severity" value="warning" />
+	<property name="fileExtensions" value="java" />
+
+	<!-- TreeWalker: ソースコードの構文木を解析し、詳細なルールを適用します。 -->
+	<module name="TreeWalker">
+
+		<!-- ===================================================================== -->
+		<!-- 潜在的なバグやエラーを検出するルール (Spotlessでは修正不可) -->
+		<!-- ===================================================================== -->
+
+		<!-- equals()をオーバーライドするならhashCode()も必須 (Mapのキーなどで問題が発生する) -->
+		<module name="EqualsHashCode" />
+
+		<!-- switch文でbreak/returnを忘れて処理が次のcaseに流れるのを検出 -->
+		<module name="FallThrough" />
+
+		<!-- 文字列リテラルの比較に "==" を使っているのを検出 (バグの元) -->
+		<module name="StringLiteralEquality" />
+
+		<!-- "new Boolean(true)" のような非推奨のインスタンス化を検出 -->
+		<module name="IllegalInstantiation" />
+
+		<!-- 継承したメソッドのシグネチャが親と完全に一致しない場合に警告 (例: @Override忘れ) -->
+		<module name="MissingOverride" />
+
+		<!-- 内部クラスが外部クラスのフィールドを隠蔽(シャドウイング)するのを検出 -->
+		<module name="HiddenField">
+			<property name="ignoreConstructorParameter" value="true" />
+			<property name="ignoreSetter" value="true" />
+		</module>
+
+		<!-- 非推奨となった finalize() メソッドの使用を禁止 -->
+		<module name="NoFinalizer" />
+
+		<!-- ===================================================================== -->
+		<!-- コードの可読性・保守性を高めるためのルール (ロジック寄り) -->
+		<!-- ===================================================================== -->
+
+		<!-- "import foo.*" のようなワイルドカードimportを禁止 (意図しないクラスの利用を防ぐ) -->
+		<module name="AvoidStarImport" />
+
+		<!-- 何も処理がない空のブロックを検出 (意図しない空処理を防ぐ) -->
+		<module name="EmptyBlock">
+			<property name="option" value="TEXT" />
+			<property name="tokens"
+				value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_FOR" />
+		</module>
+
+		<!-- interfaceのメソッドのpublicなど、冗長な修飾子を検出 -->
+		<module name="RedundantModifier" />
+
+	</module>
+</module>

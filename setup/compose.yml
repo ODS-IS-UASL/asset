@@ -1,0 +1,49 @@
+services:
+  db:
+    image: ${DB_CONTAINER_IMAGE}
+    container_name: ${DB_CONTAINER_NAME}
+    networks:
+      - droneroute.nw
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - "./data/db:/var/lib/postgresql/data"
+    ports:
+      - "127.0.0.1:${DB_PORT}:${DB_PORT}"
+  droneport:
+    image: ${DRONEPORT_CONTAINER_IMAGE}
+    container_name: ${DRONEPORT_CONTAINER_LABEL}
+
+    networks:
+      - droneroute.nw
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - "./data/droneport/log:/var/log/java-app"
+    environment:
+      - DRONEPORT_API_PORT=${DRONEPORT_API_PORT}
+      - DATASOURCE_HOST=${DATASOURCE_HOST}
+      - DB_CONTAINER_NAME=${DB_CONTAINER_NAME}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - DB_USER_NAME=${DB_USER_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - USER_ATTRIBUTE_API_ORIGIN=${USER_ATTRIBUTE_API_ORIGIN}
+      - ROUTE_OPERATOR_ID=${ROUTE_OPERATOR_ID}
+      - ASSET_API_KEY=${ASSET_API_KEY}
+      - VIS_BROKER_HOST=${VIS_BROKER_HOST}
+      - VIS_BROKER_USER_NAME=${VIS_BROKER_USER_NAME}
+      - VIS_BROKER_PASSWORD=${VIS_BROKER_PASSWORD}
+      - VIS_BROKER_CLIENT_ID=${VIS_BROKER_CLIENT_ID}
+      - VIS_TELEMETRY_ENABLE=${VIS_TELEMETRY_ENABLE}
+    ports:
+      - "127.0.0.1:${DRONEPORT_API_PORT}:${DRONEPORT_API_PORT}"
+
+networks:
+  droneroute.nw:
+    name: droneroute.nw
+    driver: bridge

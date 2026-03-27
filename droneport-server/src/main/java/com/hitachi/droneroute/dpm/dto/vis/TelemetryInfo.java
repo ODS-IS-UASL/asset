@@ -4,158 +4,95 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * VISから取得したドローンポートテレメトリ情報
- * @author dpls01
- *
- */
+/** VISから取得した離着陸場テレメトリ情報DTO */
 @NoArgsConstructor
 @Getter
 @Setter
 public class TelemetryInfo {
-	/**
-	 * ドローンポートID
-	 */
-	private String droneportId;
-	
-	/**
-	 * IPアドレス
-	 */
-	private String droneportIpAddress;
-	
-	/**
-	 * ドローンポート名
-	 */
-	private String droneportName;
-	
-	/**
-	 * ドローンポートステータス
-	 */
-	private String droneportStatus;
-	
-	/**
-	 * VISステータス
-	 */
-	private String visStatus;
+  /** 離着陸場ID */
+  private String droneportId;
 
-	/**
-	 * 緯度
-	 */
-	private Double droneportLat;
+  /** IPアドレス */
+  private String droneportIpAddress;
 
-	/**
-	 * 経度
-	 */
-	private Double droneportLon;
+  /** 離着陸場名 */
+  private String droneportName;
 
-	/**
-	 * 着地面対地高度
-	 */
-	private Double droneportAlt;
+  /** 離着陸場ステータス */
+  private String droneportStatus;
 
-	/**
-	 * 風向
-	 */
-	private Double windDirection;
+  /** VISステータス */
+  private String visStatus;
 
-	/**
-	 * 風速
-	 */
-	private Double windSpeed;
+  /** 緯度 */
+  private Double droneportLat;
 
-	/**
-	 * 最大風速時風向
-	 */
-	private Double maxinstWindDirection;
-	
-	/**
-	 * 最大風速
-	 */
-	private Double maxinstWindSpeed;
+  /** 経度 */
+  private Double droneportLon;
 
-	/**
-	 * 雨量
-	 */
-	private Double rainfall;
+  /** 着地面対地高度 */
+  private Double droneportAlt;
 
-	/**
-	 * 気温
-	 */
-	private Double temp;
-	
-	/**
-	 * 湿度
-	 */
-	private Double humidity;
-	
-	/**
-	 * 気圧
-	 */
-	private Double pressure;
-	
-	/**
-	 * 照度
-	 */
-	private Double illuminance;
-	
-	/**
-	 * 紫外線
-	 */
-	private Double ultraviolet;
+  /** 風向 */
+  private Double windDirection;
 
-	/**
-	 * 観測時間
-	 */
-	private String observationTime;
+  /** 風速 */
+  private Double windSpeed;
 
-	/**
-	 * 侵入検知有無
-	 */
-	private boolean invasionFlag;
-	
-	/**
-	 * 検知物カテゴリ
-	 */
-	private String invasionCategory;
-	
-	/**
-	 * 閾値（風速）
-	 */
-	private Double thresholdWindSpeed;
-	
-	/**
-	 * 拠点ID
-	 */
-	private String baseId;
-	
-	/**
-	 * 拠点住所
-	 */
-	private String baseAddress;
-	
-	/**
-	 * 拠点名称
-	 */
-	private String baseName;
-	
-	/**
-	 * 拠点ステータス
-	 */
-	private String baseStatus;
+  /** 最大風速時風向 */
+  private Double maxinstWindDirection;
 
-	/**
-	 * ドローンポート使用可否状態
-	 */
-	private Integer usage;
+  /** 最大風速 */
+  private Double maxinstWindSpeed;
 
-	/**
-	 * エラーコード
-	 */
-	private String errorCode;
+  /** 雨量 */
+  private Double rainfall;
 
-	/**
-	 * エラー内容
-	 */
-	private String errorReason;
+  /** 気温 */
+  private Double temp;
 
+  /** 湿度 */
+  private Double humidity;
+
+  /** 気圧 */
+  private Double pressure;
+
+  /** 照度 */
+  private Double illuminance;
+
+  /** 紫外線 */
+  private Double ultraviolet;
+
+  /** 観測時間 */
+  private String observationTime;
+
+  /** 侵入検知有無 */
+  private boolean invasionFlag;
+
+  /** 検知物カテゴリ */
+  private String invasionCategory;
+
+  /** 閾値（風速） */
+  private Double thresholdWindSpeed;
+
+  /** 拠点ID */
+  private String baseId;
+
+  /** 拠点住所 */
+  private String baseAddress;
+
+  /** 拠点名称 */
+  private String baseName;
+
+  /** 拠点ステータス */
+  private String baseStatus;
+
+  /** 離着陸場使用可否状態 */
+  private Integer usage;
+
+  /** エラーコード */
+  private String errorCode;
+
+  /** エラー内容 */
+  private String errorReason;
 }

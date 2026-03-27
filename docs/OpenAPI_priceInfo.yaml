@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: "料金情報管理API"
+  version: "1.0.0"
+servers:
+- url: http://localhost:8080
+paths:
+  /asset/api/price/info/resourcePriceList:
+    get:
+      tags:
+      - price-info-controller
+      operationId: resourcePriceList
+      description: リソース料金情報検索
+      parameters:
+      - name: priceInfoSearchListRequestDto
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/PriceInfoSearchListRequestDto"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceInfoSearchListResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  responses:
+    CheckError:
+      description: チェックエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorDetail:
+                type: string
+                description: エラー詳細
+            required:
+              - errorDetail
+    InternalServerError:
+      description: サーバ内部エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorDetail:
+                type: string
+                description: エラー詳細
+            required:
+              - errorDetail
+
+  schemas:
+    PriceInfoSearchListRequestDto:
+      type: object
+      description: 一覧取得リクエストの検索条件(クエリパラメータ)
+      properties:
+        priceId:
+          type: string
+          format: uuid
+          description: 料金ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440004"
+        resourceId:
+          type: string
+          description: リソースID。カンマ区切りで複数指定可能。料金設定リソースのID。機体はUUID。離着陸場は「航路事業者ID-離着陸場メーカーID-連番」
+          example: "550e8400-e29b-41d4-a716-446655440005,ROUTEOPRID-PORTMFRID-101"
+        resourceType:
+          type: integer
+          description: "リソース種別。20: 離着陸場, 30: 機体。"
+          enum: [20, 30]
+          example: 20
+        primaryRouteOperatorId:
+          type: string
+          description: 主管航路事業者ID。フォーマットの縛りは設けないが、基本的にUUID形式を想定。
+          example: "550e8400-e29b-41d4-a716-446655440005"
+        priceType:
+          type: integer
+          description: "料金タイプ。1: 時間(秒)課金, 2: 時間(分)課金, 3: 時間(時)課金, 4: 時間(日)課金, 5: 時間(週)課金, 6: 時間(月)課金, 7: 時間(年)課金。"
+          enum: [1, 2, 3, 4, 5, 6, 7]
+          example: 1
+        pricePerUnitFrom:
+          type: integer
+          description: 料金単位。A分B円のAの部分の下限。1から2147483647。
+          minimum: 1
+          maximum: 2147483647
+          example: 500
+        pricePerUnitTo:
+          type: integer
+          description: 料金単位。A分B円のAの部分の上限。1から2147483647。
+          minimum: 1
+          maximum: 2147483647
+          example: 2000
+        priceFrom:
+          type: integer
+          description: 料金(円/税抜)。A分B円のBの部分の下限。0から2147483647。
+          minimum: 0
+          maximum: 2147483647
+          example: 100
+        priceTo:
+          type: integer
+          description: 料金(円/税抜)。A分B円のBの部分の上限。0から2147483647。
+          minimum: 0
+          maximum: 2147483647
+          example: 1000
+        effectiveStartTime:
+          type: string
+          format: date-time
+          description: 適用開始日時。ISO 8601形式。
+          example: "2023-01-01T00:00:00Z"
+        effectiveEndTime:
+          type: string
+          format: date-time
+          description: 適用終了日時。ISO 8601形式。
+          example: "2023-12-31T23:59:59Z"
+      required:
+        - resourceId
+    PriceInfoSearchListElement:
+      type: object
+      description: 検索結果(リソース)の1要素
+      properties:
+        resourceId:
+          type: string
+          description: リソースID。料金設定リソースのID。離着陸場以外はUUID。離着陸場は「航路事業者ID-離着陸場メーカーID-連番」
+          example: "550e8400-e29b-41d4-a716-446655440005"
+        resourceType:
+          type: integer
+          description: "リソース種別。20: 離着陸場, 30: 機体。"
+          enum: [20, 30]
+          example: 20
+        priceInfos:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceInfoSearchListDetailElement"
+          description: 料金情報のリスト。
+    PriceInfoSearchListDetailElement:
+      type: object
+      description: 検索結果(料金情報)の1要素
+      properties:
+        priceId:
+          type: string
+          format: uuid
+          description: 料金ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440004"
+        primaryRouteOperatorId:
+          type: string
+          description: 主管航路事業者ID。フォーマットの縛りは設けないが、基本的にUUID形式を想定。
+          example: "550e8400-e29b-41d4-a716-446655440005"
+        priceType:
+          type: integer
+          description: "料金タイプ。1: 時間(秒)課金, 2: 時間(分)課金, 3: 時間(時)課金, 4: 時間(日)課金, 5: 時間(週)課金, 6: 時間(月)課金, 7: 時間(年)課金。"
+          enum: [1, 2, 3, 4, 5, 6, 7]
+          example: 1
+        pricePerUnit:
+          type: integer
+          description: 料金単位。A分B円のAの部分。
+          example: 1000
+        price:
+          type: integer
+          description: 料金(円/税抜)。A分B円のBの部分。
+          example: 5000
+        effectiveStartTime:
+          type: string
+          format: date-time
+          description: 適用開始日時。ISO 8601形式。
+          example: "2023-01-01T00:00:00Z"
+        effectiveEndTime:
+          type: string
+          format: date-time
+          description: 適用終了日時。ISO 8601形式。
+          example: "2023-12-31T23:59:59Z"
+        priority:
+          type: integer
+          description: 優先度。値が小さいほど優先度が高い。
+          example: 5
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+    PriceInfoSearchListResponseDto:
+      type: object
+      description: 一覧取得結果のレスポンスボディ
+      properties:
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceInfoSearchListElement"
+          description: 料金設定リソースのリスト(内部に料金情報のリストを持つ)。
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: アクセストークン(JWT形式)。アクセストークン内のoperator_idを使用して認可を行います。
+
+security:
+  - bearerAuth: []

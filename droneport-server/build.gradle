@@ -1,0 +1,188 @@
+// =================================================================
+// プラグイン設定
+// プロジェクトで利用する機能（Java, Spring Boot, JaCoCoなど）を有効化します。
+// =================================================================
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.3'
+    id 'jacoco' // コードカバレッジ測定
+    id 'checkstyle' // 静的コード解析
+    id 'com.github.johnrengelman.shadow' version '7.1.2' // 依存関係を含む単一JARファイル作成
+    id "com.diffplug.spotless" version "6.25.0" // コードフォーマット自動整形
+}
+
+group = 'com.hitachi.droneroute'
+version = '0.0.1'
+sourceCompatibility = '17' // Java 17 を使用
+ext['tomcat.version'] = '10.1.45'
+
+// =================================================================
+// 依存ライブラリの定義
+// プロジェクトで利用する外部ライブラリ（Spring, Camel, Lombokなど）を指定します。
+// =================================================================
+repositories {
+    mavenCentral() // ライブラリをダウンロードしてくる場所
+}
+
+dependencies {
+    // アプリケーション本体で利用するライブラリ
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.apache.camel.springboot:camel-spring-boot-starter'
+    implementation 'org.apache.camel.springboot:camel-paho-starter'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.8.2'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.apache.camel.springboot:camel-spring-boot-starter:4.8.5'
+    implementation 'org.apache.camel.springboot:camel-paho-starter:4.8.5'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // ユニットテストでのみ利用するライブラリ
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.apache.camel:camel-test-spring-junit5:4.8.1'
+    testRuntimeOnly 'com.h2database:h2'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+// =================================================================
+// テスト実行に関する設定
+// =================================================================
+test {
+    useJUnitPlatform() // テストフレームワークとしてJUnit 5を使用
+    maxParallelForks 4 // テストを並列実行して時間短縮
+
+    // 実行するテストクラスの命名規則
+    include '**/*Test.class'
+    include '**/*Tests.class'
+    include '**/*TestCase.class'
+
+    // テスト結果のログ出力設定
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat 'full'
+    }
+
+    finalizedBy jacocoTestReport // テスト完了後にJaCoCoレポートを生成
+}
+
+// =================================================================
+// JaCoCo (コードカバレッジ) に関する設定
+// =================================================================
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+// カバレッジレポートの生成設定
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true  // CodeBuildなどのCIツール向け
+        html.required = true // 開発者がブラウザで確認する向け
+    }
+    // カバレッジ測定の対象となるクラスファイルが格納されているディレクトリを指定します
+    def mainSourceSet = sourceSets.main
+    classDirectories.from = files(mainSourceSet.output.classesDirs)
+
+    // ソースコードの場所を指定します（レポートでソースがハイライトされるようになります）
+    sourceDirectories.from = files(mainSourceSet.allSource.srcDirs)
+
+    // テスト実行によって生成された .exec ファイルを指定します
+    executionData.from = files(layout.buildDirectory.files('jacoco/test.exec'))
+}
+
+// カバレッジ率の閾値チェック設定
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            // 行カバレッジが80%未満の場合にビルドを失敗させる
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.80
+            }
+            // 分岐カバレッジが70%未満の場合にビルドを失敗させる
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+        }
+    }
+    // 検証対象のクラスファイルが格納されているディレクトリを指定します
+    def mainSourceSet = sourceSets.main
+    classDirectories.from = files(mainSourceSet.output.classesDirs)
+
+    // ソースコードの場所を指定します
+    sourceDirectories.from = files(mainSourceSet.allSource.srcDirs)
+
+    // テスト実行によって生成された .exec ファイルを指定します
+    executionData.from = files(layout.buildDirectory.files('jacoco/test.exec'))
+}
+
+// =================================================================
+// Checkstyle (静的コード解析) に関する設定
+// =================================================================
+checkstyle {
+    toolVersion = '10.12.4'
+    configFile = file("${rootDir}/checkstyle.xml")
+    ignoreFailures = false
+    maxWarnings = 0 // 警告が1つでもあればビルドを失敗させる
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
+checkstyleTest {
+    source = 'src/test/java'
+}
+
+// =================================================================
+// Spotless (コード自動整形) に関する設定
+// =================================================================
+spotless {
+    java {
+        // GoogleのJavaフォーマッターを適用 (インデント、スペース等を自動修正)
+        googleJavaFormat()
+        // import文の順序を整理し、未使用のimport文を削除
+        importOrder()
+        removeUnusedImports()
+        // ファイル末尾に改行を必須にする
+        endWithNewline()
+    }
+}
+
+// =================================================================
+// Spring Boot / Shadow JAR に関する設定
+// =================================================================
+bootJar {
+    launchScript()
+}
+
+springBoot {
+    mainClass = 'com.hitachi.droneroute.DroneportServerApplication'
+}
+
+shadowJar {
+    archiveClassifier.set('all')
+    mergeServiceFiles()
+}
+
+// =================================================================
+// ビルド全体の品質ゲート設定
+// `./gradlew check` を実行した際に、以下のタスクをまとめて実行する
+// =================================================================
+check {
+    dependsOn spotlessCheck, checkstyleMain, checkstyleTest, jacocoTestCoverageVerification
+}
+
+// ... （javadoc, delombok, targetClassesなどの設定は変更なし）

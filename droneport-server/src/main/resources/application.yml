@@ -1,9 +1,17 @@
 server:
   # RESTコントローラのポート
-  port: 8080
+  port: ${DRONEPORT_API_PORT}
   tomcat:
     relaxed-path-chars: <,>,[,]
     relaxed-query-chars: <,>,[,],|,{,}
+    # セキュリティ対策用ヘッダー設定
+    remoteip:
+      protocol-header: x-forwarded-proto
+      remote-ip-header: x-forwarded-for
+      port-header: x-forwarded-port
+  # セキュリティ対策用ヘッダー設定
+  server-header: 
+  forward-headers-strategy: framework
 
 spring:
   main:
@@ -14,9 +22,9 @@ spring:
   # JDBC Datasource設定
   datasource:
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/droneroute?rewriteBatchedStatements=true
+    username: ${DB_USER_NAME}
+    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DB_CONTAINER_NAME}:${DB_PORT}/${DB_NAME}?rewriteBatchedStatements=true
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   jpa:
@@ -71,6 +79,21 @@ codemaster:
       2: "使用可"
       3: "使用不可"
       4: "メンテナンス中"
+    processing-type:
+      1: "登録"
+      2: "更新"
+      3: "削除"
+    price-info-resource-type:
+      20: "離着陸場"
+      30: "機体"
+    price-info-price-type:
+      1: "時間(秒)課金"
+      2: "時間(分)課金"
+      3: "時間(時間)課金"
+      4: "時間(日)課金"
+      5: "時間(週)課金"
+      6: "時間(月)課金"
+      7: "時間(年)課金"
 
 systemsettings:
   settingclass:
@@ -78,19 +101,20 @@ systemsettings:
       supportFormat: "png,jpeg,heic,heif"
       maxBinarySize: "2097152"
     visConnectInfo:
-      brokerUrl: "tcp://localhost:1883"
-      userName: "droneroutehitachi"
-      password: "droneroutehitachi"
+      brokerUrl: ${VIS_BROKER_HOST}
+      userName: ${VIS_BROKER_USER_NAME}
+      password: ${VIS_BROKER_PASSWORD}
       qos: "0"
-      clientId: "droneroute"
-      mqttBaseUri: "paho:%s?brokerUrl=%s&userName=%s&password=%s&qos=%s&clientId=%s"
-      topicSubscribeTelemetryInfo: "dt/dadc/hitachi/droneport/information/#"
+      clientId: ${VIS_BROKER_CLIENT_ID}
+      mqttBaseUri: "paho:%s?brokerUrl=%s&userName=%s&password=%s&qos=%s"
+      topicSubscribeTelemetryInfo: "dt/dadc/hitachi/droneport/information"
       topicSubscribeQueryReservationRequest: "cmd/dadc/hitachi/droneport/booking/list"
       topicPublishQueryReservationResponse: "res/dadc/vis/droneport/booking/list"
-      enableSubscribeTelemetryInfo: "false"
-      enableSubscribeQueryReservationRequest: "false"
+      enableSubscribeTelemetryInfo: ${VIS_TELEMETRY_ENABLE}
+      enableSubscribeQueryReservationRequest: ${VIS_TELEMETRY_ENABLE}
     dronePortId:
       dronerouteOperatorId: "ROUTEOPRID"
+      dronePortManufacturerId: "PORTMFRID"
       format: "%s-%s-%d"
     dronePortReservation:
       reservablePortType: "1,2"
@@ -108,3 +132,51 @@ systemsettings:
     aircraftReserveInfoListDefault:
       sortOrders: "1,0"
       sortColumns: "reservationTime,aircraftId"
+    priceInfoListDefault:
+      sortOrders: "1,0,0,0"
+      sortColumns: "effectiveTime,resourceType,resourceId,priority"
+    fileData:
+      supportFileMime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,application/pdf,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,application/vnd.apple.pages,application/vnd.apple.numbers,application/vnd.apple.keynote,application/vnd.google-apps.document,application/vnd.google-apps.spreadsheet,application/vnd.google-apps.presentation,application/x-js-taro,text/plain,application/rtf,text/csv,text/tab-separated-values,application/json,application/xml,text/xml,application/x-yaml,text/yaml,image/png,image/jpeg"
+      maxFileBinarySize: "1073741824"
+    fileInfos:
+      maxFileCount: "100"
+    payloadInfos:
+      maxPayloadCount: "20"
+    operatorInfo:
+      systemOperatorId: ${ROUTE_OPERATOR_ID}
+    user-attribute-api:
+      url: "${USER_ATTRIBUTE_API_ORIGIN}/user/api/v1/user_attr"
+      method: "POST"
+    roleId:
+      routeOperator: "1"
+      routeOperatorManager: "10"
+      routeOperatorAssignee: "11"
+      routeProvider: "2"
+      routeProviderManager: "20"
+      routeProviderAssignee: "21"
+      routeObserver: "3"
+    batch:
+      assetApiKey: ${ASSET_API_KEY}
+      assetBatchApiList: "/asset/api/droneport/info/publicDataExtract,/asset/api/droneport/reserve/publicDataExtract,/asset/api/aircraft/info/publicDataExtract,/asset/api/aircraft/reserve/publicDataExtract"
+
+resourceRoles:
+    checkTargets:
+    - path: "/droneport/info"
+      method: "POST"
+      requireSystemOperator: "true"
+    - path: "/droneport/info"
+      method: "PUT"
+      requireSystemOperator: "true"
+    - path: "/droneport/info/*"
+      method: "DELETE"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info"
+      method: "POST"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info"
+      method: "PUT"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info/*"
+      method: "DELETE"
+      requireSystemOperator: "true"
+

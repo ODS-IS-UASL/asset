@@ -1,22 +1,27 @@
 package com.hitachi.droneroute.cmn.exception;
 
-/**
- * サービスクラスでエラー発生時の例外クラス
- * @author Hiroshi Toyoda
- *
- */
+/** サービスクラスでエラー発生時の例外クラス */
 public class ServiceErrorException extends RuntimeException {
 
-	/**
-	 * serialVersionUID
-	 */
-	private static final long serialVersionUID = 1L;
+  /** serialVersionUID */
+  private static final long serialVersionUID = 1L;
 
-	public ServiceErrorException(String message) {
-		super(message);
-	}
+  /**
+   * コンストラクタ
+   *
+   * @param message エラーメッセージ
+   */
+  public ServiceErrorException(String message) {
+    super(message);
+  }
 
-	public ServiceErrorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * コンストラクタ
+   *
+   * @param message エラーメッセージ
+   * @param cause 原因となった例外
+   */
+  public ServiceErrorException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

@@ -1,50 +1,47 @@
 package com.hitachi.droneroute.config;
 
+import com.hitachi.droneroute.cmn.controller.LoggingHandlerInterceptor;
+import com.hitachi.droneroute.cmn.resolver.QueryStringArgsResolver;
 import java.util.List;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.hitachi.droneroute.cmn.controller.LoggingHandlerInterceptor;
-import com.hitachi.droneroute.cmn.resolver.QueryStringArgsResolver;
-
-import lombok.RequiredArgsConstructor;
-
-/**
- * WebMvcコンフィグレーションクラス.
- */
+/** WebMvcコンフィグレーションクラス. */
 @RequiredArgsConstructor
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-	
-	private final QueryStringArgsResolver resolver;
-	
-	private final LoggingHandlerInterceptor loggingHandlerInterceptor;
 
-	/**
-	 * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurer#addArgumentResolvers(java.util.List)
-	 */
-	@Override
-	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(resolver);
-	}
+  private final QueryStringArgsResolver resolver;
 
-	@Override
-	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(loggingHandlerInterceptor);
-	}
+  private final LoggingHandlerInterceptor loggingHandlerInterceptor;
 
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-				.allowedOrigins("*")
-				.allowedHeaders(CorsConfiguration.ALL)
-				.allowedMethods(CorsConfiguration.ALL)
-				.allowCredentials(false)
-				;
-	}
+  /**
+   * @see
+   *     org.springframework.web.servlet.config.annotation.WebMvcConfigurer#addArgumentResolvers(java.util.List)
+   */
+  @Override
+  public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> resolvers) {
+    resolvers.add(resolver);
+  }
+
+  @Override
+  public void addInterceptors(@NonNull InterceptorRegistry registry) {
+    registry.addInterceptor(loggingHandlerInterceptor);
+  }
+
+  @Override
+  public void addCorsMappings(@NonNull CorsRegistry registry) {
+    registry
+        .addMapping("/**")
+        .allowedOrigins("*")
+        .allowedHeaders(CorsConfiguration.ALL)
+        .allowedMethods(CorsConfiguration.ALL)
+        .allowCredentials(false);
+  }
 }

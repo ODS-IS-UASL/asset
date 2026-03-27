@@ -1,0 +1,171 @@
+#ローカル環境DBでのテスト用ymlファイル
+server:
+  # RESTコントローラのポート
+  port: 8080
+  tomcat:
+    relaxed-path-chars: <,>,[,]
+    relaxed-query-chars: <,>,[,],|,{,}
+    # セキュリティ対策用ヘッダー設定
+    remoteip:
+      protocol-header: x-forwarded-proto
+      remote-ip-header: x-forwarded-for
+      port-header: x-forwarded-port
+  # セキュリティ対策用ヘッダー設定
+  server-header: 
+  forward-headers-strategy: framework
+spring:
+  application:
+    name: droneport-server
+  datasource:
+    driverClassName: org.postgresql.Driver
+    username: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/droneroute?rewriteBatchedStatements=true
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        boot:
+          allow_jdbc_metadata_access: false
+
+logging:
+  level:
+    com.hitachi.droneroute: debug
+
+droneroute:
+  basepath: /asset/api
+
+codemaster:
+  codeclass:
+    droneport-info-port-type:
+      0: "緊急着陸地点"
+      1: "ドローンポート"
+      2: "離発着場"
+    droneport-info-usage-type:
+      1: "駐機場"
+      2: "緊急着陸地点"
+    droneport-info-drone-port-type:
+      1: "自システム管理"
+      2: "VIS管理"
+      3: "他事業者管理"
+    droneport-reserve-usage-type:
+      1: "離陸ポート"
+      2: "着陸ポート"
+      3: "その他"
+    aircraft-info-aircraft_type:
+      1: "飛行機"
+      2: "回転翼航空機（ヘリコプター）"
+      3: "回転翼航空機（マルチローター）"
+      4: "回転翼航空機（その他）"
+      5: "滑空機"
+      6: "飛行船"
+    aircraft-info-owner-type:
+      1: "事業者所有機体"
+      2: "レンタル機体"
+    droneport-info-active-status:
+      1: "準備中"
+      2: "使用可"
+      3: "使用不可"
+      4: "メンテナンス中"
+    processing-type:
+      1: "登録"
+      2: "更新"
+      3: "削除"
+    price-info-resource-type:
+      20: "離着陸場"
+      30: "機体"
+    price-info-price-type:
+      1: "時間(秒)課金"
+      2: "時間(分)課金"
+      3: "時間(時間)課金"
+      4: "時間(日)課金"
+      5: "時間(週)課金"
+      6: "時間(月)課金"
+      7: "時間(年)課金"
+
+systemsettings:
+  settingclass:
+    imageData:
+      supportFormat: "png,jpeg,heic,heif"
+      maxBinarySize: "2097152"
+    visConnectInfo:
+      brokerUrl: "tcp://localhost:1883"
+      userName: "exampleuser"
+      password: "examplepass"
+      qos: "0"
+      clientId: "droneroute"
+      mqttBaseUri: "paho:%s?brokerUrl=%s&userName=%s&password=%s&qos=%s"
+      topicSubscribeTelemetryInfo: "dt/dadc/hitachi/droneport/information"
+      topicSubscribeQueryReservationRequest: "cmd/dadc/hitachi/droneport/booking/list"
+      topicPublishQueryReservationResponse: "res/dadc/vis/droneport/booking/list"
+      enableSubscribeTelemetryInfo: "false"
+      enableSubscribeQueryReservationRequest: "false"
+    dronePortId:
+      dronerouteOperatorId: "ROUTEOPRID"
+      dronePortManufacturerId: "PORTMFRID"
+      format: "%s-%s-%d"
+    dronePortReservation:
+      reservablePortType: "1,2"
+    getListDefault:
+      perPage: "50"
+    dronePortInfoListDefault:
+      sortOrders: "1,0"
+      sortColumns: "dronePortName,dronePortId"
+    dronePortReserveInfoListDefault:
+      sortOrders: "1,0"
+      sortColumns: "reservationTime,dronePortId"
+    aircraftInfoListDefault:
+      sortOrders: "0,0"
+      sortColumns: "aircraftName,aircraftId"
+    aircraftReserveInfoListDefault:
+      sortOrders: "1,0"
+      sortColumns: "reservationTime,aircraftId"
+    priceInfoListDefault:
+      sortOrders: "1,0,0,0"
+      sortColumns: "effectiveTime,resourceType,resourceId,priority"
+    fileData:
+      supportFileMime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint,application/pdf,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.presentation,application/vnd.apple.pages,application/vnd.apple.numbers,application/vnd.apple.keynote,application/vnd.google-apps.document,application/vnd.google-apps.spreadsheet,application/vnd.google-apps.presentation,application/x-js-taro,text/plain,application/rtf,text/csv,text/tab-separated-values,application/json,application/xml,text/xml,application/x-yaml,text/yaml,image/png,image/jpeg"
+      maxFileBinarySize: "1073741824"
+    fileInfos:
+      maxFileCount: "100"
+    payloadInfos:
+      maxPayloadCount: "20"
+    operatorInfo:
+      systemOperatorId: 12345678-1234-1234-1234-123456789abc
+    user-attribute-api:
+      url: "http://example.domain.com/user/api/v1/user_attr"
+      method: "POST"
+    roleId:
+      routeOperator: "1"
+      routeOperatorManager: "10"
+      routeOperatorAssignee: "11"
+      routeProvider: "2"
+      routeProviderManager: "20"
+      routeProviderAssignee: "21"
+      routeObserver: "3"
+    batch:
+      assetApiKey: 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+      assetBatchApiList: "/asset/api/droneport/info/publicDataExtract,/asset/api/droneport/reserve/publicDataExtract,/asset/api/aircraft/info/publicDataExtract,/asset/api/aircraft/reserve/publicDataExtract"
+
+resourceRoles:
+    checkTargets:
+    - path: "/droneport/info"
+      method: "POST"
+      requireSystemOperator: "true"
+    - path: "/droneport/info"
+      method: "PUT"
+      requireSystemOperator: "true"
+    - path: "/droneport/info/*"
+      method: "DELETE"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info"
+      method: "POST"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info"
+      method: "PUT"
+      requireSystemOperator: "true"
+    - path: "/aircraft/info/*"
+      method: "DELETE"
+      requireSystemOperator: "true"

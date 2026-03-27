@@ -1,0 +1,1547 @@
+openapi: 3.0.3
+info:
+  title: "離着陸場情報管理API"
+  version: "1.0.2"
+servers:
+- url: http://localhost:8080
+paths:
+  /asset/api/droneport/info:
+    post:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_post
+      description: 離着陸場情報登録
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DronePortInfoRegisterRequestDto"
+        required: true
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortInfoRegisterResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_put
+      description: 離着陸場情報更新
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DronePortInfoRegisterRequestDto"
+        required: true
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortInfoRegisterResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/info/{dronePortId}:
+    delete:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_delete
+      description: 離着陸場情報削除
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: dronePortId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/info/list:
+    get:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_getList
+      description: 離着陸場情報一覧取得
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: dronePortName
+        in: query
+        required: false
+        description: 離着陸場名。最大24文字。部分一致。
+        example: "東京離着陸場"
+        schema:
+          type: string
+          maxLength: 24
+      - name: address
+        in: query
+        required: false
+        description: 設置場所住所。最大50文字。部分一致。
+        example: "東京都渋谷区"
+        schema:
+          type: string
+          maxLength: 50
+      - name: manufacturer
+        in: query
+        required: false
+        description: 製造メーカー。最大24文字。部分一致。
+        example: "株式会社XYZ"
+        schema:
+          type: string
+          maxLength: 24
+      - name: serialNumber
+        in: query
+        required: false
+        description: 製造番号。最大20文字。部分一致。
+        example: "SN789012"
+        schema:
+          type: string
+          maxLength: 20
+      - name: portType
+        in: query
+        required: false
+        description: '離着陸場種類。カンマ区切りの複数指定可（例: "1,2"）。0: 緊急着陸地点, 1: 無人（離着陸場）, 2: 有人（離着陸場）。'
+        example: "1,2"
+        schema:
+          type: string
+      - name: minLat
+        in: query
+        required: false
+        description: 最小緯度(南側)。-90〜90。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 30.0
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: minLon
+        in: query
+        required: false
+        description: 最小経度(西側)。-180〜180。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 130.0
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: maxLat
+        in: query
+        required: false
+        description: 最大緯度(北側)。-90〜90。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 40.0
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: maxLon
+        in: query
+        required: false
+        description: 最大経度(東側)。-180〜180。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 150.0
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: supportDroneType
+        in: query
+        required: false
+        description: 対応機体。最大24文字。部分一致。
+        example: "小型ドローン"
+        schema:
+          type: string
+          maxLength: 24
+      - name: activeStatus
+        in: query
+        required: false
+        description: '動作状況。カンマ区切りの複数指定可（例: "1,2"）。1: 準備中, 2: 使用可, 3: 使用不可, 4: メンテナンス中。'
+        example: "1,2"
+        schema:
+          type: string
+      - name: perPage
+        in: query
+        required: false
+        description: 1ページ当たりの件数。1～100。page指定の場合には必須。未設定の場合にはページ制御なし。
+        example: "10"
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 現在ページ番号。1～2147483647。未設定の場合にはページ制御なし。
+        example: "1"
+        schema:
+          type: string
+      - name: sortOrders
+        in: query
+        required: false
+        description: ソート順。カンマ区切りの0(昇順)または1(降順)のみ。sortColumnsと件数一致必須。
+        example: "1,0"
+        schema:
+          type: string
+      - name: sortColumns
+        in: query
+        required: false
+        description: ソート対象列。sortOrdersと件数一致必須。
+        example: "dronePortId,updateTime"
+        schema:
+          type: string
+      - name: publicFlag
+        in: query
+        required: false
+        description: 公開可否フラグ。boolean値。自事業の航路運営者が指定した場合のみ有効な条件(それ以外は無効な条件(true固定で検索)となる)。自事業の航路運営者が指定しない場合は、true/false問わず検索。
+        example: "true"
+        schema:
+          type: string
+      - name: isRequiredPriceInfo
+        in: query
+        required: false
+        description: 料金情報要否。boolean値。
+        example: "true"
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortInfoListResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/info/publicDataExtract:
+    get:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_getPublicDataExtract
+      description: 離着陸場情報公開データ抽出(RDFバッチ処理用)
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - name: dronePortName
+        in: query
+        required: false
+        description: 離着陸場名。最大24文字。部分一致。
+        example: "東京離着陸場"
+        schema:
+          type: string
+          maxLength: 24
+      - name: address
+        in: query
+        required: false
+        description: 設置場所住所。最大50文字。部分一致。
+        example: "東京都渋谷区"
+        schema:
+          type: string
+          maxLength: 50
+      - name: manufacturer
+        in: query
+        required: false
+        description: 製造メーカー。最大24文字。部分一致。
+        example: "株式会社XYZ"
+        schema:
+          type: string
+          maxLength: 24
+      - name: serialNumber
+        in: query
+        required: false
+        description: 製造番号。最大20文字。部分一致。
+        example: "SN789012"
+        schema:
+          type: string
+          maxLength: 20
+      - name: portType
+        in: query
+        required: false
+        description: '離着陸場種類。カンマ区切りの複数指定可（例: "1,2"）。0: 緊急着陸地点, 1: 無人（離着陸場）, 2: 有人（離着陸場）。'
+        example: "1,2"
+        schema:
+          type: string
+      - name: minLat
+        in: query
+        required: false
+        description: 最小緯度(南側)。-90〜90。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 30.0
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: minLon
+        in: query
+        required: false
+        description: 最小経度(西側)。-180〜180。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 130.0
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: maxLat
+        in: query
+        required: false
+        description: 最大緯度(北側)。-90〜90。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 40.0
+        schema:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+      - name: maxLon
+        in: query
+        required: false
+        description: 最大経度(東側)。-180〜180。緯度経度系はどれか1つ入力がある場合には他も必須。
+        example: 150.0
+        schema:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+      - name: supportDroneType
+        in: query
+        required: false
+        description: 対応機体。最大24文字。部分一致。
+        example: "小型ドローン"
+        schema:
+          type: string
+          maxLength: 24
+      - name: activeStatus
+        in: query
+        required: false
+        description: '動作状況。カンマ区切りの複数指定可（例: "1,2"）。1: 準備中, 2: 使用可, 3: 使用不可, 4: メンテナンス中。'
+        example: "1,2"
+        schema:
+          type: string
+      - name: isRequiredPriceInfo
+        in: query
+        required: false
+        description: 料金情報要否。boolean値。
+        example: "true"
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortInfoPublicDataExtractResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/info/detail/{dronePortId}:
+    get:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_getDetail
+      description: 離着陸場情報詳細取得(自事業の航路運営者以外の場合、離着陸場情報の公開可否フラグがtrueの詳細情報のみ取得)
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: dronePortId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: isRequiredPriceInfo
+        in: query
+        required: false
+        schema:
+          type: string
+        description: "料金情報要否。boolean値。"
+        example: "true"
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortInfoDetailResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/environment/{dronePortId}:
+    get:
+      tags:
+      - drone-port-info-controller
+      operationId: droneport_getEnvironment
+      description: 離着陸場周辺情報取得
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: dronePortId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortEnvironmentInfoResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/reserve:
+    post:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_post
+      description: 離着陸場予約情報登録(リクエスト元のユーザ情報から予約事業者IDを自動設定する)
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DronePortReserveInfoRegisterListRequestDto"
+        required: true
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortReserveInfoRegisterListResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_put
+      description: 離着陸場予約情報更新(運航事業者の場合、リクエスト元ユーザの所属事業者IDが更新対象のデータの予約事業者IDと一致していれば、更新可能)
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DronePortReserveInfoUpdateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortReserveInfoUpdateResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/reserve/{reserveId}:
+    delete:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_delete
+      description: 離着陸場予約情報削除(運航事業者の場合、リクエスト元ユーザの所属事業者IDが削除対象のデータの予約事業者IDと一致していれば、削除可能)
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: reserveId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: 予約ID。UUID形式。一括予約IDまたは機体予約IDいずれかを指定。デフォルトは一括予約ID。離着陸場予約IDを指定する場合は、クエリパラメータの離着陸場予約ID使用フラグにtrueを設定。
+          example: "12e67612-bf67-48a8-b5d6-9c18bfcdd5b3"
+        - name: dronePortReservationIdFlag
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 離着陸場予約ID使用フラグ。boolean値
+          example: "true"
+      responses:
+        "200":
+          description: 正常応答
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/reserve/list:
+    get:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_list
+      description: 離着陸場予約情報一覧取得
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: groupReservationId
+        in: query
+        required: false
+        description: 一括予約ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440012"
+        schema:
+          type: string
+          format: uuid
+      - name: dronePortId
+        in: query
+        required: false
+        description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。完全一致。
+        example: "ROUTEOPRID-PORTMFRID-101"
+        schema:
+          type: string
+      - name: dronePortName
+        in: query
+        required: false
+        description: 離着陸場名称。最大24文字。部分一致。
+        example: "東京離着陸場"
+        schema:
+          type: string
+          maxLength: 24
+      - name: aircraftId
+        in: query
+        required: false
+        description: 使用機体ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440013"
+        schema:
+          type: string
+          format: uuid
+      - name: routeReservationId
+        in: query
+        required: false
+        description: 経路予約ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440010"
+        schema:
+          type: string
+          format: uuid
+      - name: timeFrom
+        in: query
+        required: false
+        description: 日時条件(開始)。ISO 8601形式。
+        example: "2023-10-01T00:00:00Z"
+        schema:
+          type: string
+          format: date-time
+      - name: timeTo
+        in: query
+        required: false
+        description: 日時条件(終了)。ISO 8601形式。
+        example: "2023-10-31T23:59:59Z"
+        schema:
+          type: string
+          format: date-time
+      - name: reserveProviderId
+        in: query
+        required: false
+        description: 予約事業者ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440010"
+        schema:
+          type: string
+          format: uuid
+      - name: perPage
+        in: query
+        required: false
+        description: 1ページ当たりの件数。1～100。page指定の場合には必須。未設定の場合にはページ制御なし。
+        example: "10"
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 現在ページ番号。1～2147483647。未設定の場合にはページ制御なし。
+        example: "1"
+        schema:
+          type: string
+      - name: sortOrders
+        in: query
+        required: false
+        description: ソート順。カンマ区切りの0(昇順)または1(降順)のみ。sortColumnsと件数一致必須。
+        example: "1,0"
+        schema:
+          type: string
+      - name: sortColumns
+        in: query
+        required: false
+        description: ソート対象列。sortOrdersと件数一致必須。
+        example: "dronePortId,updateTime"
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortReserveInfoListResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/reserve/publicDataExtract:
+    get:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_getPublicDataExtract
+      description: 離着陸場予約情報公開データ抽出(RDFバッチ処理用)
+      security:
+      - apiKeyAuth: []
+      parameters:
+      - name: groupReservationId
+        in: query
+        required: false
+        description: 一括予約ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440012"
+        schema:
+          type: string
+          format: uuid
+      - name: dronePortId
+        in: query
+        required: false
+        description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。完全一致。
+        example: "ROUTEOPRID-PORTMFRID-101"
+        schema:
+          type: string
+      - name: dronePortName
+        in: query
+        required: false
+        description: 離着陸場名称。最大24文字。部分一致。
+        example: "東京離着陸場"
+        schema:
+          type: string
+          maxLength: 24
+      - name: aircraftId
+        in: query
+        required: false
+        description: 使用機体ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440013"
+        schema:
+          type: string
+          format: uuid
+      - name: routeReservationId
+        in: query
+        required: false
+        description: 経路予約ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440010"
+        schema:
+          type: string
+          format: uuid
+      - name: timeFrom
+        in: query
+        required: false
+        description: 日時条件(開始)。ISO 8601形式。
+        example: "2023-10-01T00:00:00Z"
+        schema:
+          type: string
+          format: date-time
+      - name: timeTo
+        in: query
+        required: false
+        description: 日時条件(終了)。ISO 8601形式。
+        example: "2023-10-31T23:59:59Z"
+        schema:
+          type: string
+          format: date-time
+      - name: reserveProviderId
+        in: query
+        required: false
+        description: 予約事業者ID。UUID形式。完全一致。
+        example: "550e8400-e29b-41d4-a716-446655440010"
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortReserveInfoPublicDataExtractResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /asset/api/droneport/reserve/detail/{reserveId}:
+    get:
+      tags:
+      - drone-port-reserve-info-controller
+      operationId: droneport_reserve_detail
+      description: 離着陸場予約情報詳細取得
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: reserveId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: 正常応答
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DronePortReserveInfoDetailResponseDto"
+        "400":
+          $ref: "#/components/responses/CheckError"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+components:
+  responses:
+    CheckError:
+      description: チェックエラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorDetail:
+                type: string
+                description: エラー詳細
+            required:
+              - errorDetail
+    InternalServerError:
+      description: サーバ内部エラー
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorDetail:
+                type: string
+                description: エラー詳細
+            required:
+              - errorDetail
+  
+  schemas:
+    DronePortInfoRegisterRequestDto:
+      type: object
+      description: 離着陸場情報の登録および更新のリクエストボディ
+      properties:
+        dronePortId:
+          type: string
+          description: 離着陸場ID。更新時のみ必須。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        dronePortName:
+          type: string
+          description: 離着陸場名。最大24文字。登録時のみ必須。
+          maxLength: 24
+          example: "東京離着陸場"
+        address:
+          type: string
+          description: 設置場所住所。最大50文字。
+          maxLength: 50
+          example: "東京都渋谷区"
+        manufacturer:
+          type: string
+          description: 製造メーカー。最大24文字。
+          maxLength: 24
+          example: "株式会社XYZ"
+        serialNumber:
+          type: string
+          description: 製造番号。最大20文字。
+          maxLength: 20
+          example: "SN789012"
+        dronePortManufacturerId:
+          type: string
+          description: 離着陸場メーカーID。登録時のみ必須。更新時は設定不可。
+          maxLength: 100
+          example: "XYZ-001"
+        portType:
+          type: integer
+          description: "離着陸場種類。0: 緊急着陸地点, 1: 無人（離着陸場）, 2: 有人（離着陸場）。"
+          enum: [0, 1, 2]
+          example: 1
+        visDronePortCompanyId:
+          type: string
+          description: VIS離着陸場事業者ID。最大100文字。
+          maxLength: 100
+          example: "VIS123"
+        storedAircraftId:
+          type: string
+          format: uuid
+          description: 格納中機体ID。ポート形状が1(離着陸場)以外の場合は入力不可。
+          example: "550e8400-e29b-41d4-a716-446655440011"
+        lat:
+          type: number
+          format: double
+          description: 緯度。-90〜90。登録時のみ必須。
+          minimum: -90
+          maximum: 90
+          example: 35.6895
+        lon:
+          type: number
+          format: double
+          description: 経度。-180〜180。登録時のみ必須。
+          minimum: -180
+          maximum: 180
+          example: 139.6917
+        alt:
+          type: number
+          format: double
+          description: 着陸面対地高度。0〜100。
+          minimum: 0
+          maximum: 100
+          example: 10.0
+        supportDroneType:
+          type: string
+          description: 対応機体。最大24文字。
+          maxLength: 24
+          example: "小型ドローン"
+        activeStatus:
+          type: integer
+          description: '動作状況。登録時のみ必須。1: 準備中, 2: 使用可, 3: 使用不可, 4: メンテナンス中。'
+          enum: [1, 2, 3, 4]
+          example: 2
+        inactiveTimeFrom:
+          type: string
+          format: date-time
+          description: 使用不可開始日時。ISO 8601形式。activeStatus=3で必須、=4で必須(終了も必須)。activeStatus=1または2の場合は未入力である必要あり。
+          example: "2023-10-01T00:00:00Z"
+        inactiveTimeTo:
+          type: string
+          format: date-time
+          description: 使用不可終了日時。ISO 8601形式。activeStatus=4で必須。activeStatus=1または2の場合は未入力である必要あり。
+          example: "2023-10-02T00:00:00Z"
+        imageData:
+          type: string
+          description: 画像データを含む文字列。フォーマットはexample参照。データ部はBase64文字列。最大2MB。サポートフォーマットはpng,jpeg,heif。
+          example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        publicFlag:
+          type: boolean
+          description: 公開可否フラグ。登録時のみ必須。
+          example: true
+        priceInfos:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceInfoRequestDto"
+          description: 価格情報リスト。
+    PriceInfoRequestDto:
+      type: object
+      description: 料金情報
+      properties:
+        processingType:
+          type: integer
+          description: "処理種別(データに対する処理リクエストの種類)。1: 登録, 2: 更新, 3: 削除。"
+          enum: [1, 2, 3]
+          example: 1
+        priceId:
+          type: string
+          format: uuid
+          description: 料金ID。処理種別が更新または削除の場合に必須。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440004"
+        priceType:
+          type: integer
+          description: "料金タイプ。処理種別が登録の場合に必須。1: 時間(秒)課金, 2: 時間(分)課金, 3: 時間(時)課金, 4: 時間(日)課金, 5: 時間(週)課金, 6: 時間(月)課金, 7: 時間(年)課金。"
+          enum: [1, 2, 3, 4, 5, 6, 7]
+          example: 1
+        pricePerUnit:
+          type: integer
+          description: 料金単位。A分B円のAの部分。処理種別が登録の場合に必須。1から2147483647。
+          minimum: 1
+          maximum: 2147483647
+          example: 10
+        price:
+          type: integer
+          description: 料金(円/税抜)。A分B円のBの部分。処理種別が登録の場合に必須。0から2147483647。
+          minimum: 0
+          maximum: 2147483647
+          example: 1000
+        effectiveStartTime:
+          type: string
+          format: date-time
+          description: 適用開始日時。処理種別が登録の場合に必須。ISO 8601形式。
+          example: "2023-01-01T00:00:00Z"
+        effectiveEndTime:
+          type: string
+          format: date-time
+          description: 適用終了日時。処理種別が登録の場合に必須。ISO 8601形式。開始時間より後。
+          example: "2023-12-31T23:59:59Z"
+        priority:
+          type: integer
+          description: 優先度。処理種別が登録の場合に必須。1-100。値が小さいほど優先度が高い。
+          minimum: 1
+          maximum: 100
+          example: 5
+      required:
+        - processingType
+    DronePortInfoRegisterResponseDto:
+      type: object
+      description: 離着陸場登録および更新のレスポンスボディ
+      properties:
+        dronePortId:
+          type: string
+          description: 作成または更新された離着陸場ID。
+          example: "ROUTEOPRID-PORTMFRID-101"
+    DronePortInfoListResponseDto:
+      type: object
+      description: 離着陸場一覧取得のレスポンスボディ
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DronePortInfoListResponseElement"
+          description: 離着陸場リスト。
+        perPage:
+          type: integer
+          description: ページあたり件数。
+          example: 10
+        currentPage:
+          type: integer
+          description: 現在のページ。
+          example: 1
+        lastPage:
+          type: integer
+          description: 最後のページ。
+          example: 5
+        total:
+          type: integer
+          description: 全体件数。
+          example: 50
+    DronePortInfoPublicDataExtractResponseDto:
+      type: object
+      description: 離着陸場公開データ抽出のレスポンスボディ
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DronePortInfoListResponseElement"
+          description: 離着陸場リスト。
+    DronePortInfoListResponseElement:
+      type: object
+      description: 検索結果(離着陸場)の1要素
+      properties:
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        dronePortName:
+          type: string
+          description: 離着陸場名称。
+          maxLength: 24
+          example: "東京離着陸場"
+        address:
+          type: string
+          description: 設置場所住所。
+          maxLength: 50
+          example: "東京都渋谷区"
+        manufacturer:
+          type: string
+          description: 製造メーカー。
+          maxLength: 24
+          example: "株式会社XYZ"
+        serialNumber:
+          type: string
+          description: 製造番号。
+          maxLength: 20
+          example: "SN789012"
+        portType:
+          type: integer
+          description: "離着陸場種類。0: 緊急着陸地点, 1: 無人（離着陸場）, 2: 有人（離着陸場）。"
+          enum: [0, 1, 2]
+          example: 1
+        visDronePortCompanyId:
+          type: string
+          description: VIS離着陸場事業者ID。
+          maxLength: 100
+          example: "VIS123"
+        storedAircraftId:
+          type: string
+          format: uuid
+          description: 格納中機体ID。
+          example: "550e8400-e29b-41d4-a716-446655440011"
+        lat:
+          type: number
+          format: double
+          description: 緯度。
+          minimum: -90
+          maximum: 90
+          example: 35.6895
+        lon:
+          type: number
+          format: double
+          description: 経度。
+          minimum: -180
+          maximum: 180
+          example: 139.6917
+        alt:
+          type: number
+          format: double
+          description: 着陸面対地高度。
+          minimum: 0
+          maximum: 100
+          example: 10.0
+        supportDroneType:
+          type: string
+          description: 対応機体。
+          maxLength: 24
+          example: "小型ドローン"
+        activeStatus:
+          type: integer
+          description: "動作状況。1: 準備中, 2: 使用可, 3: 使用不可, 4: メンテナンス中。"
+          enum: [1, 2, 3, 4]
+          example: 2
+        scheduledStatus:
+          type: integer
+          description: "予定された動作状態。3: 使用不可, 4: メンテナンス中。"
+          enum: [3, 4]
+          example: 3
+        inactiveTimeFrom:
+          type: string
+          format: date-time
+          description: 使用不可開始時間。ISO 8601形式。
+          example: "2023-10-01T00:00:00Z"
+        inactiveTimeTo:
+          type: string
+          format: date-time
+          description: 使用不可終了時間。ISO 8601形式。
+          example: "2023-10-02T00:00:00Z"
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+        publicFlag:
+          type: boolean
+          description: 公開可否フラグ。boolean値。
+          example: true
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新時間。ISO 8601形式。
+          example: "2023-10-01T12:00:00Z"
+        priceInfos:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceInfoSearchListDetailElement"
+          description: 料金情報のリスト。
+    PriceInfoSearchListDetailElement:
+      type: object
+      description: 検索結果(料金情報)の1要素
+      properties:
+        priceId:
+          type: string
+          format: uuid
+          description: 料金ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440004"
+        primaryRouteOperatorId:
+          type: string
+          description: 主管航路事業者ID。フォーマットの縛りは設けないが、基本的にUUID形式を想定。
+          example: "550e8400-e29b-41d4-a716-446655440005"
+        priceType:
+          type: integer
+          description: "料金タイプ。1: 時間(秒)課金, 2: 時間(分)課金, 3: 時間(時)課金, 4: 時間(日)課金, 5: 時間(週)課金, 6: 時間(月)課金, 7: 時間(年)課金。"
+          enum: [1, 2, 3, 4, 5, 6, 7]
+          example: 1
+        pricePerUnit:
+          type: integer
+          description: 料金単位。A分B円のAの部分。
+          example: 1000
+        price:
+          type: integer
+          description: 料金(円/税抜)。A分B円のBの部分。
+          example: 5000
+        effectiveStartTime:
+          type: string
+          format: date-time
+          description: 適用開始日時。ISO 8601形式。
+          example: "2023-01-01T00:00:00Z"
+        effectiveEndTime:
+          type: string
+          format: date-time
+          description: 適用終了日時。ISO 8601形式。
+          example: "2023-12-31T23:59:59Z"
+        priority:
+          type: integer
+          description: 優先度。値が小さいほど優先度が高い。
+          example: 5
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+    DronePortInfoDetailResponseDto:
+      type: object
+      description: 離着陸場詳細情報取得のレスポンスボディ
+      properties:
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        dronePortName:
+          type: string
+          description: 離着陸場名称。
+          maxLength: 24
+          example: "東京離着陸場"
+        address:
+          type: string
+          description: 設置場所住所。
+          maxLength: 50
+          example: "東京都渋谷区"
+        manufacturer:
+          type: string
+          description: 製造メーカー。
+          maxLength: 24
+          example: "株式会社XYZ"
+        serialNumber:
+          type: string
+          description: 製造番号。
+          maxLength: 20
+          example: "SN789012"
+        portType:
+          type: integer
+          description: "離着陸場種類。0: 緊急着陸地点, 1: 無人（離着陸場）, 2: 有人（離着陸場）。"
+          enum: [0, 1, 2]
+          example: 1
+        visDronePortCompanyId:
+          type: string
+          description: VIS離着陸場事業者ID。
+          maxLength: 100
+          example: "VIS123"
+        storedAircraftId:
+          type: string
+          format: uuid
+          description: 格納中機体ID。
+          example: "550e8400-e29b-41d4-a716-446655440011"
+        lat:
+          type: number
+          format: double
+          description: 緯度。
+          minimum: -90
+          maximum: 90
+          example: 35.6895
+        lon:
+          type: number
+          format: double
+          description: 経度。
+          minimum: -180
+          maximum: 180
+          example: 139.6917
+        alt:
+          type: number
+          format: double
+          description: 着陸面対地高度。
+          minimum: 0
+          maximum: 100
+          example: 10.0
+        supportDroneType:
+          type: string
+          description: 対応機体。
+          maxLength: 24
+          example: "小型ドローン"
+        activeStatus:
+          type: integer
+          description: "動作状況。1: 準備中, 2: 使用可, 3: 使用不可, 4: メンテナンス中。"
+          enum: [1, 2, 3, 4]
+          example: 2
+        scheduledStatus:
+          type: integer
+          description: "予定された動作状態。3: 使用不可, 4: メンテナンス中。"
+          enum: [3, 4]
+          example: 3
+        inactiveTimeFrom:
+          type: string
+          format: date-time
+          description: 使用不可開始時間。ISO 8601形式。
+          example: "2023-10-01T00:00:00Z"
+        inactiveTimeTo:
+          type: string
+          format: date-time
+          description: 使用不可終了時間。ISO 8601形式。
+          example: "2023-10-02T00:00:00Z"
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+        publicFlag:
+          type: boolean
+          description: 公開可否フラグ。boolean値。
+          example: true
+        updateTime:
+          type: string
+          format: date-time
+          description: 更新時間。ISO 8601形式。
+          example: "2023-10-01T12:00:00Z"
+        imageData:
+          type: string
+          description: 画像データを含む文字列。フォーマットはexample参照。データ部はBase64文字列。最大2MB。サポートフォーマットはpng,jpeg,heif。
+          example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+        priceInfos:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceInfoSearchListDetailElement"
+          description: 料金情報のリスト。
+    DronePortEnvironmentInfoResponseDto:
+      type: object
+      description: 周辺情報取得のレスポンスボディ
+      properties:
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        windSpeed:
+          type: number
+          format: double
+          description: 風速(m/s)。
+          example: 5.0
+        windDirection:
+          type: number
+          format: double
+          description: 風向(度)。
+          example: 90.0
+        rainfall:
+          type: number
+          format: double
+          description: 降雨量(mm)。
+          example: 0.0
+        temp:
+          type: number
+          format: double
+          description: 気温(℃)。
+          example: 20.0
+        pressure:
+          type: number
+          format: double
+          description: 気圧(hPa)。
+          example: 1013.0
+        obstacleDetected:
+          type: boolean
+          description: 障害物検知フラグ。
+          example: false
+        observationTime:
+          type: string
+          format: date-time
+          description: 観測時間。
+          example: "2023-10-01T12:00:00Z"
+    DronePortReserveInfoRegisterListRequestDto:
+      type: object
+      description: 離着陸場予約情報登録のリクエストボディ
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Element"
+          description: 離着陸場予約リスト。
+        reserveProviderId:
+          type: string
+          description: 予約事業者ID。登録時のみ必須。
+          example: "550e8400-e29b-41d4-a716-446655440013"
+      required:
+        - data
+    Element:
+      type: object
+      description: 離着陸場予約情報(登録リクエスト)の1要素
+      properties:
+        groupReservationId:
+          type: string
+          format: uuid
+          description: 一括予約ID。 UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        aircraftId:
+          type: string
+          format: uuid
+          description: 使用機体ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440013"
+        routeReservationId:
+          type: string
+          format: uuid
+          description: 経路予約ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        usageType:
+          type: integer
+          description: "利用形態。必須。1: 離陸ポート, 2: 着陸ポート, 3: その他。"
+          enum: [1, 2, 3]
+          example: 1
+        reservationTimeFrom:
+          type: string
+          format: date-time
+          description: 予約開始時間。ISO 8601形式。
+          example: "2023-10-01T10:00:00Z"
+        reservationTimeTo:
+          type: string
+          format: date-time
+          description: 予約終了時間。ISO 8601形式。開始時間より後。
+          example: "2023-10-01T12:00:00Z"
+      required:
+        - groupReservationId
+        - dronePortId
+        - usageType
+        - reservationTimeFrom
+        - reservationTimeTo
+    DronePortReserveInfoRegisterListResponseDto:
+      type: object
+      description: 離着陸場予約情報登録のレスポンスボディ
+      properties:
+        dronePortReservationIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: 作成された離着陸場予約IDリスト。
+          example: ["550e8400-e29b-41d4-a716-446655440007"]
+    DronePortReserveInfoUpdateRequestDto:
+      type: object
+      description: 離着陸場予約情報更新のリクエストボディ
+      properties:
+        dronePortReservationId:
+          type: string
+          format: uuid
+          description: 離着陸場予約ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440007"
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        aircraftId:
+          type: string
+          format: uuid
+          description: 機体ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440009"
+        routeReservationId:
+          type: string
+          format: uuid
+          description: 経路予約ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        usageType:
+          type: integer
+          description: "利用形態。必須。1: 離陸ポート, 2: 着陸ポート, 3: その他。"
+          enum: [1, 2, 3]
+          example: 1
+        reservationTimeFrom:
+          type: string
+          format: date-time
+          description: 予約開始時間。必須。ISO 8601形式。
+          example: "2023-10-01T10:00:00Z"
+        reservationTimeTo:
+          type: string
+          format: date-time
+          description: 予約終了時間。必須。ISO 8601形式。開始時間より後。
+          example: "2023-10-01T12:00:00Z"
+      required:
+        - dronePortReservationId
+    DronePortReserveInfoUpdateResponseDto:
+      type: object
+      description: 離着陸場予約情報更新のレスポンスボディ
+      properties:
+        dronePortReservationId:
+          type: string
+          format: uuid
+          description: 更新された離着陸場予約ID。
+          example: "550e8400-e29b-41d4-a716-446655440007"
+    DronePortReserveInfoListElement:
+      type: object
+      description: 検索結果(離着陸場予約)の1要素
+      properties:
+        dronePortReservationId:
+          type: string
+          format: uuid
+          description: 離着陸場予約ID。
+          example: "550e8400-e29b-41d4-a716-446655440007"
+        groupReservationId:
+          type: string
+          format: uuid
+          description: 一括予約ID
+          example: "550e8400-e29b-41d4-a716-446655440007"
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        aircraftId:
+          type: string
+          format: uuid
+          description: 機体ID。
+          example: "550e8400-e29b-41d4-a716-446655440013"
+        routeReservationId:
+          type: string
+          format: uuid
+          description: 経路予約ID。
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        usageType:
+          type: integer
+          description: "利用形態。1: 離陸ポート, 2: 着陸ポート, 3: その他。"
+          enum: [1, 2, 3]
+          example: 1
+        reservationTimeFrom:
+          type: string
+          format: date-time
+          description: 予約開始時間。ISO 8601形式。
+          example: "2023-10-01T10:00:00Z"
+        reservationTimeTo:
+          type: string
+          format: date-time
+          description: 予約終了時間。ISO 8601形式。
+          example: "2023-10-01T12:00:00Z"
+        dronePortName:
+          type: string
+          description: 離着陸場名。
+          example: "東京離着陸場"
+        aircraftName:
+          type: string
+          description: 機体名。
+          example: "ドローンA"
+        visDronePortCompanyId:
+          type: string
+          description: VIS離着陸場会社ID。
+          example: "VIS123"
+        reservationActiveFlag:
+          type: boolean
+          description: 予約有効フラグ。
+          example: true
+        inactiveTimeFrom:
+          type: string
+          format: date-time
+          description: 利用不可開始時間。
+          example: "2023-10-01T00:00:00Z"
+        inactiveTimeTo:
+          type: string
+          format: date-time
+          description: 利用不可終了時間。
+          example: "2023-10-02T00:00:00Z"
+        reserveProviderId:
+          type: string
+          description: 予約事業者ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440013" 
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+    DronePortReserveInfoListResponseDto:
+      type: object
+      description: 離着陸場予約情報一覧取得のレスポンスボディ
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DronePortReserveInfoListElement"
+          description: 離着陸場予約リスト。
+        perPage:
+          type: integer
+          description: ページあたり件数。
+          example: 10
+        currentPage:
+          type: integer
+          description: 現在のページ。
+          example: 1
+        lastPage:
+          type: integer
+          description: 最後のページ。
+          example: 5
+        total:
+          type: integer
+          description: 全体件数。
+          example: 50
+    DronePortReserveInfoPublicDataExtractResponseDto:
+      type: object
+      description: 離着陸場予約情報公開データ抽出のレスポンスボディ
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/DronePortReserveInfoListElement"
+          description: 離着陸場予約リスト。
+    DronePortReserveInfoDetailResponseDto:
+      type: object
+      description: 離着陸場予約情報詳細取得のレスポンスボディ
+      properties:
+        dronePortReservationId:
+          type: string
+          format: uuid
+          description: 離着陸場予約ID。
+          example: "550e8400-e29b-41d4-a716-446655440007"
+        groupReservationId:
+          type: string
+          format: uuid
+          description: 一括予約ID
+          example: "550e8400-e29b-41d4-a716-446655440007"
+        dronePortId:
+          type: string
+          description: 離着陸場ID。航路事業者ID-離着陸場メーカーID-連番。
+          example: "ROUTEOPRID-PORTMFRID-101"
+        aircraftId:
+          type: string
+          format: uuid
+          description: 機体ID。
+          example: "550e8400-e29b-41d4-a716-446655440013"
+        routeReservationId:
+          type: string
+          format: uuid
+          description: 経路予約ID。
+          example: "550e8400-e29b-41d4-a716-446655440010"
+        usageType:
+          type: integer
+          description: "利用形態。1: 離陸ポート, 2: 着陸ポート, 3: その他。"
+          example: 1
+        reservationTimeFrom:
+          type: string
+          format: date-time
+          description: 予約開始時間。
+          example: "2023-10-01T10:00:00Z"
+        reservationTimeTo:
+          type: string
+          format: date-time
+          description: 予約終了時間。
+          example: "2023-10-01T12:00:00Z"
+        dronePortName:
+          type: string
+          maxLength: 24
+          description: 離着陸場名称。
+          example: "東京離着陸場"
+        aircraftName:
+          type: string
+          maxLength: 24
+          description: 機体名称。
+          example: "ドローンA"
+        visDronePortCompanyId:
+          type: string
+          maxLength: 100
+          description: VIS離着陸場会社ID。
+          example: "VIS123"
+        reservationActiveFlag:
+          type: boolean
+          description: 予約有効フラグ。
+          example: true
+        reserveProviderId:
+          type: string
+          description: 予約事業者ID。UUID形式。
+          example: "550e8400-e29b-41d4-a716-446655440013" 
+        operatorId:
+          type: string
+          description: オペレータID。
+          example: "ope01"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: アクセストークン(JWT形式)。アクセストークン内のoperator_idを使用して認可を行います。
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: ASSET-API-Key
+      description: APIキー。事前に発行された離着陸場・機体管理機能用のAPIキーを使用して認可を行います。

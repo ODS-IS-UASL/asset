@@ -1,6 +1,6 @@
 package com.hitachi.droneroute.dpm.service;
 
-import com.hitachi.droneroute.dpm.dto.DronePortInfoDeleteRequestDto;
+import com.hitachi.droneroute.config.dto.UserInfoDto;
 import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoDetailResponseDto;
 import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoListRequestDto;
 import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoListResponseDto;
@@ -9,45 +9,51 @@ import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoRegisterListResponseDt
 import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoUpdateRequestDto;
 import com.hitachi.droneroute.dpm.dto.DronePortReserveInfoUpdateResponseDto;
 
-/**
- *  ドローンポート予約情報サービスインタフェース
- * @author Hiroshi Toyoda
- *
- */
+/** 離着陸場予約情報サービスインタフェース */
 public interface DronePortReserveInfoService {
-	
-	/**
-	 * ドローンポート予約情報登録
-	 * @param dto ドローンポート予約情報登録更新要求
-	 * @return ドローンポート予約情報登録更新応答
-	 */
-	public DronePortReserveInfoRegisterListResponseDto register(DronePortReserveInfoRegisterListRequestDto dto);
 
-	/**
-	 * ドローンポート予約情報更新
-	 * @param dto ドローンポート予約情報登録更新要求
-	 * @return ドローンポート予約情報登録更新応答
-	 */
-	public DronePortReserveInfoUpdateResponseDto update(DronePortReserveInfoUpdateRequestDto dto);
-	
-	/**
-	 * ドローンポート予約情報削除
-	 * @param dronePortReserveInfoId ドローンポート予約ID 
-	 * @param dto ドローンポート予約情報削除要求
-	 */
-	public void delete(String dronePortReservationId, DronePortInfoDeleteRequestDto dto);
-	
-	/**
-	 * ドローンポート予約情報一覧取得
-	 * @param dto ドローンポート予約情報一覧取得要求
-	 * @return ドローンポート予約情報一覧取得応答
-	 */
-	public DronePortReserveInfoListResponseDto getList(DronePortReserveInfoListRequestDto dto);
-	
-	/**
-	 * ドローンポート予約情報詳細取得
-	 * @param dronePortReservationId ドローンポート予約ID
-	 * @return
-	 */
-	public DronePortReserveInfoDetailResponseDto getDetail(String dronePortReservationId);
+  /**
+   * 離着陸場予約情報登録
+   *
+   * @param dto 離着陸場予約情報登録更新要求
+   * @param userInfo 認可ユーザー情報
+   * @return 離着陸場予約情報登録更新応答
+   */
+  DronePortReserveInfoRegisterListResponseDto register(
+      DronePortReserveInfoRegisterListRequestDto dto, UserInfoDto userInfo);
+
+  /**
+   * 離着陸場予約情報更新
+   *
+   * @param dto 離着陸場予約情報登録更新要求
+   * @param userInfo 認可ユーザー情報
+   * @return 離着陸場予約情報登録更新応答
+   */
+  DronePortReserveInfoUpdateResponseDto update(
+      DronePortReserveInfoUpdateRequestDto dto, UserInfoDto userInfo);
+
+  /**
+   * 離着陸場予約情報削除
+   *
+   * @param ReservationId 一括予約IDまたは離着陸場予約ID
+   * @param dronePortReservationIdFlag 離着陸場予約ID使用フラグ
+   * @param userInfo 認可ユーザー情報
+   */
+  void delete(String ReservationId, Boolean dronePortReservationIdFlag, UserInfoDto userInfo);
+
+  /**
+   * 離着陸場予約情報一覧取得
+   *
+   * @param dto 離着陸場予約情報一覧取得要求
+   * @return 離着陸場予約情報一覧取得応答
+   */
+  DronePortReserveInfoListResponseDto getList(DronePortReserveInfoListRequestDto dto);
+
+  /**
+   * 離着陸場予約情報詳細取得
+   *
+   * @param dronePortReservationId 離着陸場予約ID
+   * @return 離着陸場予約情報詳細取得応答
+   */
+  DronePortReserveInfoDetailResponseDto getDetail(String dronePortReservationId);
 }

@@ -1,0 +1,1 @@
+CREATE TYPE "TSRANGE" AS timestamp array;
